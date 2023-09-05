@@ -24,12 +24,10 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Open in Github plugin
 Plugin 'Almo7aya/openingh.nvim'
 " For easy c++ header file switching
-"Plugin 'vim-scripts/a.vim'
-"Plugin 'Valloric/YouCompleteMe'
-Plugin 'terryma/vim-smooth-scroll'
-Plugin 'tmux-plugins/vim-tmux-focus-events'
-Plugin 'hashivim/vim-terraform'
-Plugin 'earthly/earthly.vim'
+Plugin 'vim-scripts/a.vim'
+Plugin 'bfrg/vim-cpp-modern'
+" tmux navigation plugin
+Plugin 'christoomey/vim-tmux-navigator'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -46,15 +44,31 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
-colorscheme desert
-" Changed search highlight color to not be ridiculous from desert color scheme
-autocmd ColorScheme * hi Search cterm=NONE ctermfg=grey ctermbg=brown
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Original Author:
-"       Amir Salihefendic
-"       version 5.0 - 29/05/12 15:43:36
+" Maintainer: 
+"       Originally created by Amir Salihefendic
+"       http://amix.dk - amix@amix.dk
+"       Modified to suit Daniel Phelps
+"
+" Version: 
+"       5.0 - 29/05/12 15:43:36
+"
+" Blog_post: 
 "       http://amix.dk/blog/post/19691#The-ultimate-Vim-configuration-on-Github
+"
+" Awesome_version:
+"       Get this config, nice color schemes and lots of plugins!
+"
+"       Install the awesome version from:
+"
+"           https://github.com/amix/vimrc
+"
+" Syntax_highlighted:
+"       http://amix.dk/vim/vimrc.html
+"
+" Raw_version: 
+"       http://amix.dk/vim/vimrc.txt
 "
 " Sections:
 "    -> General
@@ -69,14 +83,34 @@ autocmd ColorScheme * hi Search cterm=NONE ctermfg=grey ctermbg=brown
 "    -> vimgrep searching and cope displaying
 "    -> Spell checking
 "    -> Misc
-"    -> Tmux integrations                                                                                                                                                                                                                                            [318/31646]
 "    -> Helper functions
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+colorscheme desert
+
+" Sets how many lines of history VIM has to remember
+set history=500
+
+" Enable filetype plugins
+filetype plugin on
+filetype indent on"
+
+" Set to auto read when a file is changed from the outside
+set autoread
+
 " With a map leader it's possible to do extra key combinations
+" like <leader>w saves the current file
 let mapleader = ","
 let g:mapleader = ","
+
+" :W sudo saves the file 
+" (useful for handling the permission-denied error)
+command W w !sudo tee % > /dev/null
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -93,61 +127,33 @@ command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-hea
 map <leader>e :NERDTreeToggle<CR>
 map <leader>r :NERDTreeFind<CR>
 
+" a.vim
+map <leader>a :A<CR>
+
 " Openingh
 map <leader>gh :OpenInGHFile<CR>
 
 let NERDTreeShowLineNumbers=1
 autocmd FileType nerdtree setlocal relativenumber
 
-" smooth-scroll
-noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 0, 4)<CR>
-noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 0, 4)<CR>
-noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 0, 8)<CR>
-noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 0, 8)<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Sets how many lines of history VIM has to remember
-set history=500
-
-set relativenumber
-set nu
-
-" Enable filetype plugins
-filetype plugin on
-filetype indent on
-
-" Set to auto read when a file is changed from the outside
-set autoread
-
-" Enable when using Termux with the stupid Android Bluetooth keyboard
-"imap ` <Esc>
-
-" :W sudo saves the file
-" (useful for handling the permission-denied error)
-"command W w !sudo tee % > /dev/null
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Set 7 lines to the cursor - when moving vertically using j/k
-set so=7
 
-" Avoid garbled characters in Chinese language windows OS
-let $LANG='en'
-set langmenu=en
-source $VIMRUNTIME/delmenu.vim
-source $VIMRUNTIME/menu.vim
+set number
+set relativenumber
+
+" Set 5 lines to the cursor - when moving vertically using j/k
+set so=5
 
 " Turn on the WiLd menu
 set wildmenu
 
-" Ignore compiled files                                                                                                                                                                                                                                              [248/31646]
+" Ignore compiled files
 set wildignore=*.o,*~,*.pyc
 " Ignore node_modules (added Jan 19 2016 for Qualtrics)
-set wildignore=*/node_modules/*,*/bower_components/*,*/dist/*
+set wildignore+=*/node_modules/*,*/bower_components/*,*/dist/*
 
 if has("win16") || has("win32")
     set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
@@ -161,38 +167,35 @@ set ruler
 " Height of the command bar
 set cmdheight=2
 
-" A buffer becomes hidden when it is abandoned
-set hid
-
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
 set whichwrap+=<,>,h,l
 
 " In many terminal emulators the mouse works just fine, thus enable it.
 if has('mouse')
-    set mouse=a
+  set mouse=a
 endif
 
 " Ignore case when searching
 set ignorecase
 
-" When searching try to be smart about cases
+" When searching try to be smart about cases 
 set smartcase
 
 " Highlight search results
 set hlsearch
 
 " Makes search act like search in modern browsers
-set incsearch
+set incsearch 
 
 " Don't redraw while executing macros (good performance config)
-set lazyredraw
+set lazyredraw 
 
 " For regular expressions turn magic on
 set magic
 
 " Show matching brackets when text indicator is over them
-set showmatch
+set showmatch 
 " How many tenths of a second to blink when matching brackets
 set mat=2
 
@@ -210,18 +213,10 @@ set foldcolumn=1
 " => Colors and Fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
-syntax enable
+syntax enable 
 
 
 "set background=dark
-
-" Set extra options when running in GUI mode                                                                                                                                                                                                                         [177/31646]
-if has("gui_running")
-    set guioptions-=T
-    set guioptions-=e
-    set t_Co=256
-    set guitablabel=%M\ %t
-endif
 
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
@@ -242,7 +237,8 @@ set noswapfile
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Text, tab and indent related
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set expandtab
+" Use tabs, not spaces
+set noexpandtab
 
 " Be smart when using tabs ;)
 set smarttab
@@ -250,7 +246,6 @@ set smarttab
 " 1 tab == 4 spaces
 set shiftwidth=4
 set tabstop=4
-set softtabstop=4
 
 " Linebreak on 500 characters
 set lbr
@@ -282,7 +277,6 @@ map <leader>. :bn<cr>
 map j gj
 map k gk
 
-" Shortcut for vim command console                                                                                                                                                                                                                                   [107/31646]
 map <space> :
 
 " Smart way to move between windows
@@ -312,14 +306,6 @@ try
 catch
 endtry
 
-" Return to last edit position when opening files (You want this!)
-" autocmd BufReadPost *
-"      \ if line("'\"") > 0 && line("'\"") <= line("$") |
-"      \   exe "normal! g`\"" |
-"      \ endif
-" Remember info about open buffers on close
-" set viminfo^=%
-
 
 """"""""""""""""""""""""""""""
 " => Status line
@@ -344,15 +330,6 @@ if has("mac") || has("macunix")
     vmap <D-k> <M-k>
 endif
 
-" Delete trailing white space on save, useful for Python and CoffeeScript ;)
-func! DeleteTrailingWS()
-    exe "normal mz"
-    %s/\s\+$//ge
-    exe "normal `z"
-endfunc                                                                                                                                                                                                                                                               [37/31646]
-autocmd BufWrite *.py :call DeleteTrailingWS()
-autocmd BufWrite *.coffee :call DeleteTrailingWS()
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc
@@ -364,36 +341,6 @@ map <leader>pp :setlocal paste! expandtab<cr>
 map <leader>m :e ~/.vimrc<cr>
 map <leader>n :source ~/.vimrc<cr>
 
-autocmd BufNewFile,BufRead *.cinc,*.cconf set syntax=python
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Tmux integrations
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Tmux window title bugfix
-if &term == "screen"
-    set t_ts=
-    " The FocusGained/Lost events require the tmux-focus-events plugin
-    autocmd VimLeave * call RestoreTmuxTitleBehavior()
-    autocmd FocusGained * call EnableVimTitleBehavior()
-endif
-set title
-
-function! RestoreTmuxTitleBehavior()
-    set t_ts=""
-    set t_fs=""
-    call system("tmux set automatic-rename on")
-endfunction
-
-function! EnableVimTitleBehavior()
-    set t_ts=
-    set title
-endfunction
-
-" Change cursor shape in different modes (only works for tmux.
-" See vim.wikia.com/wiki/Change_cursor_shape_in_different_modes)
-"let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
-"let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Helper functions
@@ -402,7 +349,7 @@ function! CmdLine(str)
     exe "menu Foo.Bar :" . a:str
     emenu Foo.Bar
     unmenu Foo
-endfunction
+endfunction 
 
 function! VisualSelection(direction, extra_filter) range
     let l:saved_reg = @"
@@ -437,20 +384,20 @@ endfunction
 " Don't close window, when deleting a buffer
 command! Bclose call <SID>BufcloseCloseIt()
 function! <SID>BufcloseCloseIt()
-    let l:currentBufNum = bufnr("%")
-    let l:alternateBufNum = bufnr("#")
+   let l:currentBufNum = bufnr("%")
+   let l:alternateBufNum = bufnr("#")
 
-    if buflisted(l:alternateBufNum)
-        buffer #
-    else
-        bnext
-    endif
+   if buflisted(l:alternateBufNum)
+     buffer #
+   else
+     bnext
+   endif
 
-    if bufnr("%") == l:currentBufNum
-        new
-    endif
+   if bufnr("%") == l:currentBufNum
+     new
+   endif
 
-    if buflisted(l:currentBufNum)
-        execute("bdelete! ".l:currentBufNum)
-    endif
+   if buflisted(l:currentBufNum)
+     execute("bdelete! ".l:currentBufNum)
+   endif
 endfunction
