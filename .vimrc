@@ -21,13 +21,20 @@ Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 Plugin 'preservim/nerdtree'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'vim-scripts/nginx.vim'
 " Open in Github plugin
 Plugin 'Almo7aya/openingh.nvim'
 " For easy c++ header file switching
 Plugin 'vim-scripts/a.vim'
 Plugin 'bfrg/vim-cpp-modern'
+" Golang features: (Note: must run :GoInstallBinaries)
+Plugin 'fatih/vim-go'
 " tmux navigation plugin
 Plugin 'christoomey/vim-tmux-navigator'
+" Gruvbox Material theme
+Plugin 'sainnhe/gruvbox-material'
+" templ file syntax
+Plugin 'joerdav/templ.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -91,8 +98,6 @@ filetype plugin indent on    " required
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-colorscheme desert
-
 " Sets how many lines of history VIM has to remember
 set history=500
 
@@ -102,6 +107,11 @@ filetype indent on"
 
 " Set to auto read when a file is changed from the outside
 set autoread
+autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
+
+" Golang specific tabbing
+autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
+
 
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
@@ -111,6 +121,8 @@ let g:mapleader = ","
 " :W sudo saves the file 
 " (useful for handling the permission-denied error)
 command W w !sudo tee % > /dev/null
+
+inoremap <C-n> <C-n>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -135,6 +147,10 @@ map <leader>gh :OpenInGHFile<CR>
 
 let NERDTreeShowLineNumbers=1
 autocmd FileType nerdtree setlocal relativenumber
+
+" vim-go
+au filetype go inoremap <buffer> <C-n> <C-x><C-o>
+map <leader>gd :GoDef<CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -212,17 +228,39 @@ set foldcolumn=1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Colors and Fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"colorscheme desert
+
 " Enable syntax highlighting
 syntax enable 
-
-
-"set background=dark
 
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
 
 " Use Unix as the standard file type
 set ffs=unix,dos,mac
+
+"--------
+" Gruvbox Material theme configuration
+
+if has('termguicolors')
+    set termguicolors
+endif
+
+" For dark version.
+set background=dark
+
+" For light version.
+"set background=light
+
+" Set contrast.
+" This configuration option should be placed before `colorscheme gruvbox-material`.
+" Available values: 'hard', 'medium'(default), 'soft'
+let g:gruvbox_material_background = 'medium'
+
+" For better performance
+let g:gruvbox_material_better_performance = 1
+
+colorscheme gruvbox-material
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -237,8 +275,8 @@ set noswapfile
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Text, tab and indent related
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Use tabs, not spaces
-set noexpandtab
+" Use spaces, not tabs
+set expandtab
 
 " Be smart when using tabs ;)
 set smarttab
@@ -254,6 +292,11 @@ set tw=500
 set ai "Auto indent
 set si "Smart indent
 set wrap "Wrap lines
+
+" javascript/typescript tabwidth of 2
+autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 expandtab
+autocmd FileType typescript setlocal tabstop=2 shiftwidth=2 expandtab
+autocmd FileType typescriptreact setlocal tabstop=2 shiftwidth=2 expandtab
 
 
 """"""""""""""""""""""""""""""
