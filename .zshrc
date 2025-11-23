@@ -81,7 +81,7 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
-source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 
 # User configuration
 
